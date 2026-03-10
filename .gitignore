@@ -1,0 +1,14 @@
+.DS_Store
+.idea/
+*.iml
+
+__pycache__/
+*.py[cod]
+
+venv/
+backend/venv/
+
+backend/DEBUG_*.png
+
+gitkey
+gitkey.pub

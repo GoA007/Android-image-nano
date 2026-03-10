@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iterative AI Asset Pipeline</title>
+  <style>
+    :root {
+      --bg: #f3f4ef;
+      --surface: #ffffff;
+      --text: #152023;
+      --muted: #596367;
+      --accent: #0f766e;
+      --accent-2: #115e59;
+      --border: #d9ddcf;
+      --danger: #b43f2a;
+      --success: #167f46;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 8%, #d8efe7 0%, transparent 28%),
+        radial-gradient(circle at 92% 10%, #e7edd8 0%, transparent 28%),
+        var(--bg);
+      min-height: 100vh;
+    }
+    .app {
+      width: min(1100px, 94vw);
+      margin: 28px auto 40px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+    .header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(120deg, #edf9f5, #f5f8ea);
+    }
+    .header h1 { margin: 0; font-size: 1.25rem; }
+    .header p { margin: 4px 0 0; color: var(--muted); font-size: 0.93rem; }
+    .content {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 16px;
+      padding: 16px;
+    }
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      background: #fbfcf9;
+    }
+    .row { margin-bottom: 12px; }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    input[type="file"], input[type="text"], input[type="range"] { width: 100%; }
+    input[type="text"] {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+      color: var(--text);
+    }
+    .hint { margin-top: 6px; color: var(--muted); font-size: 0.83rem; }
+    .button-row { display: grid; gap: 8px; }
+    button {
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #fff;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover { background: var(--accent-2); }
+    button:disabled { opacity: 0.65; cursor: not-allowed; }
+    .secondary {
+      background: #fff;
+      color: var(--accent-2);
+      border-color: #9bc9c0;
+    }
+    .danger { background: var(--danger); border-color: var(--danger); }
+    .success { background: var(--success); border-color: var(--success); }
+    .progress {
+      margin-top: 10px;
+      min-height: 1.2em;
+      font-size: 0.9rem;
+      color: var(--muted);
+      padding: 8px;
+      border-left: 4px solid var(--accent);
+      background: #f2f7f4;
+      border-radius: 6px;
+      display: none;
+    }
+    .viewer {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      background: #f8faf4;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .card {
+      border: 1px solid #d6dccf;
+      border-radius: 8px;
+      background: #fff;
+      padding: 8px;
+    }
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 0.88rem;
+      color: #41535a;
+    }
+    .card img {
+      width: 100%;
+      display: none;
+      border-radius: 6px;
+      border: 1px solid #d3d9c8;
+      background: #eff3e6;
+      min-height: 90px;
+      object-fit: contain;
+    }
+    .feedback {
+      margin-top: 14px;
+      border-top: 1px dashed #cbd6ca;
+      padding-top: 12px;
+      display: none;
+    }
+    .logs-box {
+      width: 100%;
+      min-height: 220px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      background: #ffffff;
+      color: #223034;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      line-height: 1.35;
+      resize: vertical;
+    }
+    @media (max-width: 920px) {
+      .content { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <h1>Iterative AI Asset Pipeline</h1>
+      <p>Targeting -> Base Paint -> Refinement, with live progress polling and feedback reruns.</p>
+    </header>
+
+    <section class="content">
+      <aside class="panel">
+        <div class="row">
+          <label for="imageUpload">Image</label>
+          <input type="file" id="imageUpload" accept="image/*" />
+        </div>
+
+        <div class="row">
+          <label for="target">Mask Target</label>
+          <input type="text" id="target" value="fingernails" />
+        </div>
+
+        <div class="row">
+          <label for="prompt">Nail Paint Prompt</label>
+          <input type="text" id="prompt" placeholder="silver metallic" />
+        </div>
+
+        <div class="row">
+          <label for="apiBase">Backend API URL</label>
+          <input type="text" id="apiBase" placeholder="http://192.168.x.x:8000" />
+          <p class="hint">Auto-detected from current host, editable for LAN setup.</p>
+        </div>
+
+        <div class="row">
+          <label for="threshold">Detection Threshold: <span id="thresholdValue">0.03</span></label>
+          <input type="range" id="threshold" min="0.01" max="0.30" value="0.03" step="0.01" />
+          <p class="hint">Used for OwlViT fallback path. MediaPipe uses landmark detection.</p>
+        </div>
+
+        <div class="button-row">
+          <button id="startBtn" type="button">Start 3-Step Process</button>
+          <button id="saveBtn" class="secondary" type="button" disabled>Save Result</button>
+        </div>
+
+        <div id="progress" class="progress"></div>
+
+        <div id="feedbackLoop" class="feedback">
+          <label for="feedbackText">Need a refinement pass?</label>
+          <input type="text" id="feedbackText" placeholder="e.g., clean black tips, soften highlight" />
+          <div class="button-row" style="margin-top:8px;">
+            <button id="retryBtn" class="danger" type="button">Re-run With Feedback</button>
+            <button id="newBtn" class="success" type="button">Start New Image</button>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <label for="logsOutput">Process Logs (Copy/Paste)</label>
+          <textarea id="logsOutput" class="logs-box" readonly spellcheck="false"></textarea>
+        </div>
+      </aside>
+
+      <section class="viewer">
+        <div class="grid">
+          <div class="card">
+            <h3>Original</h3>
+            <img id="originalPreview" alt="Original preview" />
+          </div>
+          <div class="card">
+            <h3>Soft Mask</h3>
+            <img id="maskPreview" alt="Generated mask preview" />
+          </div>
+          <div class="card">
+            <h3>Result</h3>
+            <img id="resultPreview" alt="Generated result" />
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

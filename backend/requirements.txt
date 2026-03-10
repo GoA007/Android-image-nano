@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+python-multipart
+diffusers
+transformers
+accelerate
+torch
+torchvision
+Pillow
+numpy
+mediapipe==0.10.14
+opencv-python
